@@ -1,1 +1,96 @@
-# Projeto_Eng_Soft__Cliente_Servidor
+# Caixa Eletrônico: Cliente/Servidor
+
+Projeto de Engenharia de Software: caixa eletrônico com saque, depósito, saldo e extrato, em arquitetura cliente/servidor e MVC.
+
+- **Cliente:** Java + JavaFX, com telas FXML editáveis no Scene Builder
+- **Servidor:** Java, com API HTTP/JSON
+- **Banco de dados:** MySQL
+
+## Requisitos
+
+- JDK 25 ou mais recente
+- Apache NetBeans (já traz o Maven)
+- MySQL 8
+- Scene Builder, para editar as telas
+
+## Como executar
+
+**1. Criar o banco.** Execute [banco/schema.sql](banco/schema.sql) no MySQL Workbench. O script não apaga dados existentes.
+
+**2. Configurar a senha do MySQL.** Copie `atm-servidor/servidor.local.properties.exemplo` para `atm-servidor/servidor.local.properties` e preencha a senha. Esse arquivo não vai para o Git.
+
+**3. Abrir no NetBeans.** Vá em *File > Open Project*, selecione a pasta do repositório e abra também os módulos `ATM Servidor` e `ATM Cliente`.
+
+**4. Rodar.** Sempre nesta ordem:
+
+1. Botão direito em **ATM Servidor** > *Run*. Espere aparecer `Servidor ATM em http://127.0.0.1:8080`.
+2. Botão direito em **ATM Cliente** > *Run*.
+
+Use o *Run* do projeto. O *Run File* em uma classe do cliente falha com "JavaFX runtime components are missing".
+
+### Usuários de teste
+
+| Cliente | Cartão | PIN | Contas |
+|---|---|---|---|
+| Maria Silva | `1111222233334444` | `1234` | `0001-1` (R$ 1.000,00), `0001-2` (R$ 250,00) |
+| João Souza | `5555666677778888` | `4321` | `0002-1` (R$ 500,00) |
+
+## Estrutura
+
+```
+banco/schema.sql            Tabelas e dados de teste
+atm-servidor/               Servidor
+  model/                    Conta, Cliente, Transacao, TipoTransacao
+  dao/                      Acesso ao MySQL
+  service/                  ContaService (regras), SessaoService (tokens), Senhas (hash do PIN)
+  controller/               ApiController (rotas HTTP)
+atm-cliente/                Cliente
+  resources/.../view/       Telas FXML e atm.css (View)
+  controller/               Controllers das telas (Controller)
+  model/                    Dados recebidos do servidor (Model)
+  service/                  AtmApi (chamadas HTTP)
+```
+
+Cliente e servidor são independentes e só se comunicam por HTTP. O Model com as regras de negócio fica no servidor. A View fica no cliente.
+
+## Editar as telas
+
+No NetBeans, configure o Scene Builder em *Tools > Options > Java > JavaFX*. Depois, clique com o botão direito em um `.fxml` > *Open*. Os arquivos ficam em `atm-cliente/src/main/resources/com/atm/cliente/view/`.
+
+## API
+
+| Método | Rota | Corpo | Resposta |
+|---|---|---|---|
+| POST | `/api/autenticar` | `{cartao, pin}` | 200 `{token, nome, contas}`; 401 |
+| POST | `/api/sair` | | 200 |
+| GET | `/api/contas/{numero}/saldo` | | 200 `{saldo}` |
+| POST | `/api/contas/{numero}/saque` | `{valor}` | 200 comprovante; 409 saldo insuficiente |
+| POST | `/api/contas/{numero}/deposito` | `{valor}` | 200 comprovante |
+| GET | `/api/contas/{numero}/extrato` | | 200 `{conta, saldo, transacoes}` |
+
+As rotas de conta exigem o cabeçalho `Authorization: Bearer <token>`. Os erros vêm como `{"erro": "mensagem"}`.
+
+## Rodar em duas máquinas
+
+- **Servidor:** em `servidor.local.properties`, defina `servidor.host=0.0.0.0`.
+- **Cliente:** em `atm-cliente/src/main/resources/cliente.properties`, troque `servidor.url` pelo IP do servidor.
+
+A comunicação é HTTP sem criptografia, adequada apenas para demonstração em rede local.
+
+## Diferenças em relação aos diagramas
+
+| Diagrama | Implementação | Motivo |
+|---|---|---|
+| `saldo` e `valor` como `double` | `BigDecimal` / `DECIMAL(15,2)` | `double` acumula erro de arredondamento em dinheiro |
+| `Conta` e `Transacao` acessam o MySQL direto (mensagens 14 e 17) | Passam pelos DAOs, chamados pelo `ContaService` | Tira o SQL do Model e permite gravar saldo e transação em uma única transação do banco |
+| A sequência começa o saque em `getSaldo()` (mensagem 11) | Antes, a conta é lida do banco com trava (`FOR UPDATE`) | Evita saque duplo simultâneo |
+| `sacarValor()` (mensagem 13) | `Conta.sacar()` | Nome usado no diagrama de classes |
+| Sem operação de depósito no diagrama de sequência | Depósito segue o mesmo fluxo do saque | Requisito do projeto |
+| Cliente com várias contas, sem escolha na sequência | Seleção de conta no menu | Multiplicidade 1..* do diagrama de classes |
+| `pin` em texto | Guarda o hash PBKDF2 do PIN | Não armazenar a senha em texto |
+
+## Testes
+
+```bash
+mvn test
+```

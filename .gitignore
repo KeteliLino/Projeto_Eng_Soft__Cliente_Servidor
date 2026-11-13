@@ -22,3 +22,11 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+# Maven / NetBeans
+target/
+nbproject/
+nb-configuration.xml
+
+# Configuração local (contém a senha do MySQL)
+servidor.local.properties

@@ -1,0 +1,94 @@
+.tela {
+    -fx-background-color: #f3f5f8;
+    -fx-padding: 32;
+    -fx-spacing: 14;
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+    -fx-font-size: 15px;
+}
+
+.titulo {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #12365f;
+}
+
+.subtitulo {
+    -fx-font-size: 15px;
+    -fx-text-fill: #55637a;
+}
+
+.rotulo-campo {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #33415c;
+}
+
+.text-field, .password-field, .combo-box {
+    -fx-pref-height: 42;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-border-color: #c3ccd9;
+    -fx-background-color: white;
+}
+
+.botao-principal, .botao-secundario, .botao-valor {
+    -fx-pref-height: 46;
+    -fx-max-width: infinity;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-cursor: hand;
+    -fx-font-size: 15px;
+}
+
+.botao-principal {
+    -fx-background-color: #12365f;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.botao-principal:hover {
+    -fx-background-color: #1c4c84;
+}
+
+.botao-secundario, .botao-valor {
+    -fx-background-color: white;
+    -fx-text-fill: #12365f;
+    -fx-border-color: #12365f;
+}
+
+.botao-secundario:hover, .botao-valor:hover {
+    -fx-background-color: #e4eaf3;
+}
+
+.mensagem-erro {
+    -fx-text-fill: #b3261e;
+    -fx-font-weight: bold;
+    -fx-wrap-text: true;
+}
+
+.mensagem-sucesso {
+    -fx-text-fill: #1b6e3c;
+    -fx-font-weight: bold;
+    -fx-wrap-text: true;
+}
+
+.cartao {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-border-color: #d7dee8;
+    -fx-border-radius: 8;
+    -fx-padding: 18;
+    -fx-hgap: 16;
+    -fx-vgap: 10;
+}
+
+.saldo-grande {
+    -fx-font-size: 36px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #12365f;
+}
+
+.valor-destaque {
+    -fx-font-weight: bold;
+    -fx-text-fill: #12365f;
+}
