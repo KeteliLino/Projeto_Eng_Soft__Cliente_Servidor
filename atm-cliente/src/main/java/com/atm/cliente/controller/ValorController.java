@@ -2,6 +2,7 @@ package com.atm.cliente.controller;
 
 import com.atm.cliente.model.Sessao;
 import com.atm.cliente.model.TipoTransacao;
+import com.atm.cliente.service.ContaBancariaService;
 import java.math.BigDecimal;
 import java.util.Optional;
 import javafx.event.ActionEvent;
@@ -29,7 +30,7 @@ public class ValorController {
     void preparar(TipoTransacao tipo) {
         this.tipo = tipo;
         titulo.setText(tipo.getRotulo());
-        contaInfo.setText("Conta " + Sessao.getContaAtual());
+        contaInfo.setText("Conta " + Sessao.getInstancia().getContaAtual());
     }
 
     @FXML
@@ -47,8 +48,11 @@ public class ValorController {
 
         botaoConfirmar.setDisable(true);
         mensagem.setText("");
-        String conta = Sessao.getContaAtual();
-        Navegador.executar(() -> Navegador.api().movimentar(tipo, conta, valor.get()),
+        String conta = Sessao.getInstancia().getContaAtual();
+        ContaBancariaService servico = Navegador.servico();
+        Navegador.executar(() -> tipo == TipoTransacao.SAQUE
+                        ? servico.saque(conta, valor.get())
+                        : servico.deposito(conta, valor.get()),
                 comprovante -> Navegador.ir("Comprovante.fxml",
                         (ComprovanteController tela) -> tela.exibir(comprovante)),
                 erro -> {

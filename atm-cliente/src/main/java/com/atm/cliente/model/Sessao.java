@@ -2,48 +2,61 @@ package com.atm.cliente.model;
 
 import java.util.List;
 
-/** Dados de quem está usando o terminal agora. */
+/** Singleton: dados de quem está usando o terminal agora, os mesmos para todas as telas. */
 public final class Sessao {
 
-    private static String token;
-    private static String nome;
-    private static List<String> contas = List.of();
-    private static String contaAtual;
+    private static Sessao instancia;
+
+    private String token;
+    private String nome;
+    private List<String> contas = List.of();
+    private String contaAtual;
 
     private Sessao() {
     }
 
-    public static void iniciar(LoginResposta login) {
+    public static synchronized Sessao getInstancia() {
+        if (instancia == null) {
+            instancia = new Sessao();
+        }
+        return instancia;
+    }
+
+    public void iniciar(LoginResposta login) {
         token = login.token();
         nome = login.nome();
         contas = login.contas();
         contaAtual = contas.isEmpty() ? null : contas.getFirst();
     }
 
-    public static void encerrar() {
+    public void encerrar() {
         token = null;
         nome = null;
         contas = List.of();
         contaAtual = null;
     }
 
-    public static String getToken() {
+    public boolean isAtiva() {
+        return token != null;
+    }
+
+    public String getToken() {
         return token;
     }
 
-    public static String getNome() {
+    public String getNome() {
         return nome;
     }
 
-    public static List<String> getContas() {
+    public List<String> getContas() {
         return contas;
     }
 
-    public static String getContaAtual() {
+    public String getContaAtual() {
         return contaAtual;
     }
 
-    public static void setContaAtual(String conta) {
+    public void setContaAtual(String conta) {
         contaAtual = conta;
     }
 }

@@ -4,7 +4,6 @@ import com.atm.cliente.model.Comprovante;
 import com.atm.cliente.model.Extrato;
 import com.atm.cliente.model.LoginResposta;
 import com.atm.cliente.model.Sessao;
-import com.atm.cliente.model.TipoTransacao;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
@@ -25,10 +24,19 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Properties;
 
-/** Faz as chamadas HTTP ao servidor e converte as respostas JSON para o model. */
-public class AtmApi {
+/**
+ * Proxy: representa no terminal o ContaService que roda no servidor. As telas chamam os métodos
+ * como se o serviço fosse local; por baixo, o proxy:
+ * <ul>
+ *   <li>(proxy remoto) monta a requisição HTTP, converte o JSON e trata a falta de conexão;</li>
+ *   <li>(proxy de proteção) só envia operações de conta com sessão ativa, anexa o token e
+ *       encerra a sessão local quando o servidor responde que ela expirou.</li>
+ * </ul>
+ */
+public class ContaServiceProxy implements ContaBancariaService {
 
     private static final Duration TEMPO_LIMITE = Duration.ofSeconds(10);
+    private static final String SESSAO_EXPIRADA = "Sessão expirada. Insira o cartão novamente.";
 
     private final HttpClient http = HttpClient.newBuilder().connectTimeout(TEMPO_LIMITE).build();
     private final Gson gson = new GsonBuilder()
@@ -36,29 +44,60 @@ public class AtmApi {
                     (JsonDeserializer<LocalDateTime>) (json, tipo, ctx) -> LocalDateTime.parse(json.getAsString()))
             .create();
     private final String urlBase = lerUrlServidor();
+    private final Sessao sessao = Sessao.getInstancia();
 
+    @Override
     public LoginResposta autenticar(String cartao, String pin) throws ApiException {
         String corpo = gson.toJson(Map.of("cartao", cartao, "pin", pin));
         return gson.fromJson(enviar("POST", "/api/autenticar", corpo), LoginResposta.class);
     }
 
+    /** Avisa o servidor e encerra a sessão local mesmo se o servidor não responder. */
+    @Override
     public void sair() throws ApiException {
-        enviar("POST", "/api/sair", "");
+        try {
+            if (sessao.isAtiva()) {
+                enviar("POST", "/api/sair", "");
+            }
+        } finally {
+            sessao.encerrar();
+        }
     }
 
-    public Comprovante movimentar(TipoTransacao tipo, String conta, BigDecimal valor) throws ApiException {
-        String operacao = tipo == TipoTransacao.SAQUE ? "saque" : "deposito";
+    @Override
+    public Comprovante saque(String conta, BigDecimal valor) throws ApiException {
+        return movimentar(conta, "saque", valor);
+    }
+
+    @Override
+    public Comprovante deposito(String conta, BigDecimal valor) throws ApiException {
+        return movimentar(conta, "deposito", valor);
+    }
+
+    private Comprovante movimentar(String conta, String operacao, BigDecimal valor) throws ApiException {
+        exigirSessao();
         String corpo = gson.toJson(Map.of("valor", valor));
         return gson.fromJson(enviar("POST", caminhoConta(conta, operacao), corpo), Comprovante.class);
     }
 
+    @Override
     public BigDecimal saldo(String conta) throws ApiException {
+        exigirSessao();
         JsonObject resposta = gson.fromJson(enviar("GET", caminhoConta(conta, "saldo"), null), JsonObject.class);
         return resposta.get("saldo").getAsBigDecimal();
     }
 
+    @Override
     public Extrato extrato(String conta) throws ApiException {
+        exigirSessao();
         return gson.fromJson(enviar("GET", caminhoConta(conta, "extrato"), null), Extrato.class);
+    }
+
+    /** Controle de acesso: sem sessão, a operação nem chega a ir para a rede. */
+    private void exigirSessao() throws ApiException {
+        if (!sessao.isAtiva()) {
+            throw new ApiException(401, SESSAO_EXPIRADA);
+        }
     }
 
     private String caminhoConta(String conta, String operacao) {
@@ -67,8 +106,8 @@ public class AtmApi {
 
     private String enviar(String metodo, String caminho, String corpo) throws ApiException {
         HttpRequest.Builder pedido = HttpRequest.newBuilder(URI.create(urlBase + caminho)).timeout(TEMPO_LIMITE);
-        if (Sessao.getToken() != null) {
-            pedido.header("Authorization", "Bearer " + Sessao.getToken());
+        if (sessao.isAtiva()) {
+            pedido.header("Authorization", "Bearer " + sessao.getToken());
         }
         pedido.method(metodo, corpo == null
                 ? HttpRequest.BodyPublishers.noBody()
@@ -84,6 +123,9 @@ public class AtmApi {
             throw new ApiException(0, "Operação interrompida.");
         }
 
+        if (resposta.statusCode() == 401 && sessao.isAtiva()) {
+            sessao.encerrar();
+        }
         if (resposta.statusCode() != 200) {
             throw new ApiException(resposta.statusCode(), lerMensagemDeErro(resposta.body()));
         }
@@ -100,7 +142,7 @@ public class AtmApi {
 
     private static String lerUrlServidor() {
         Properties config = new Properties();
-        try (InputStream entrada = AtmApi.class.getResourceAsStream("/cliente.properties")) {
+        try (InputStream entrada = ContaServiceProxy.class.getResourceAsStream("/cliente.properties")) {
             config.load(entrada);
         } catch (IOException e) {
             throw new UncheckedIOException(e);

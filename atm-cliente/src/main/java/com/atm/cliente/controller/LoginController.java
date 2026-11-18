@@ -30,9 +30,9 @@ public class LoginController {
 
         botaoEntrar.setDisable(true);
         mensagem.setText("");
-        Navegador.executar(() -> Navegador.api().autenticar(cartao, senha),
+        Navegador.executar(() -> Navegador.servico().autenticar(cartao, senha),
                 login -> {
-                    Sessao.iniciar(login);
+                    Sessao.getInstancia().iniciar(login);
                     Navegador.ir("Menu.fxml");
                 },
                 erro -> {

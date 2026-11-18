@@ -13,7 +13,7 @@ public class SaldoController {
     private Label valorSaldo;
 
     void exibir(BigDecimal saldo) {
-        contaInfo.setText("Conta " + Sessao.getContaAtual());
+        contaInfo.setText("Conta " + Sessao.getInstancia().getContaAtual());
         valorSaldo.setText(Formatos.moeda(saldo));
     }
 

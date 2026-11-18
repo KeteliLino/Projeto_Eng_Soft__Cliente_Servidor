@@ -14,9 +14,10 @@
       <Label fx:id="valorSaldo" styleClass="valor-destaque" text="R$ 0,00" />
       <TableView fx:id="tabela" prefHeight="200.0" VBox.vgrow="ALWAYS">
          <columns>
-            <TableColumn fx:id="colunaData" prefWidth="150.0" sortable="false" text="Data" />
-            <TableColumn fx:id="colunaTipo" prefWidth="100.0" sortable="false" text="Tipo" />
-            <TableColumn fx:id="colunaValor" prefWidth="140.0" sortable="false" text="Valor" />
+            <TableColumn fx:id="colunaData" prefWidth="112.0" sortable="false" text="Data" />
+            <TableColumn fx:id="colunaTipo" prefWidth="70.0" sortable="false" text="Tipo" />
+            <TableColumn fx:id="colunaValor" prefWidth="104.0" sortable="false" text="Valor" />
+            <TableColumn fx:id="colunaSaldo" prefWidth="104.0" sortable="false" text="Saldo" />
          </columns>
          <placeholder>
             <Label text="Nenhuma transação nesta conta." />

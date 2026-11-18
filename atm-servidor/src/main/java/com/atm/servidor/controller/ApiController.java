@@ -1,5 +1,9 @@
 package com.atm.servidor.controller;
 
+import com.atm.servidor.command.DepositoCommand;
+import com.atm.servidor.command.ExtratoCommand;
+import com.atm.servidor.command.SaldoCommand;
+import com.atm.servidor.command.SaqueCommand;
 import com.atm.servidor.model.SaldoInsuficienteException;
 import com.atm.servidor.service.ApiException;
 import com.atm.servidor.service.ContaService;
@@ -37,13 +41,8 @@ public class ApiController implements HttpHandler {
             .registerTypeAdapter(LocalDateTime.class,
                     (JsonSerializer<LocalDateTime>) (data, tipo, ctx) -> new JsonPrimitive(data.toString()))
             .create();
-    private final ContaService contaService;
-    private final SessaoService sessoes;
-
-    public ApiController(ContaService contaService, SessaoService sessoes) {
-        this.contaService = contaService;
-        this.sessoes = sessoes;
-    }
+    private final ContaService contaService = new ContaService();
+    private final SessaoService sessoes = SessaoService.getInstancia();
 
     @Override
     public void handle(HttpExchange troca) throws IOException {
@@ -94,11 +93,14 @@ public class ApiController implements HttpHandler {
         exigirMetodo(metodo, operacao.equals("saque") || operacao.equals("deposito") ? "POST" : "GET");
         String cartao = sessoes.validar(lerToken(troca));
 
+        // Cada rota vira um comando; o ContaService executa todos do mesmo jeito.
         return switch (operacao) {
-            case "saque" -> contaService.saque(cartao, numeroConta, lerCorpo(troca, ValorPedido.class).valor());
-            case "deposito" -> contaService.deposito(cartao, numeroConta, lerCorpo(troca, ValorPedido.class).valor());
-            case "saldo" -> Map.of("saldo", contaService.saldo(cartao, numeroConta));
-            default -> contaService.extrato(cartao, numeroConta);
+            case "saque" -> contaService.executar(cartao, numeroConta,
+                    new SaqueCommand(lerCorpo(troca, ValorPedido.class).valor()));
+            case "deposito" -> contaService.executar(cartao, numeroConta,
+                    new DepositoCommand(lerCorpo(troca, ValorPedido.class).valor()));
+            case "saldo" -> Map.of("saldo", contaService.executar(cartao, numeroConta, new SaldoCommand()));
+            default -> contaService.executar(cartao, numeroConta, new ExtratoCommand());
         };
     }
 

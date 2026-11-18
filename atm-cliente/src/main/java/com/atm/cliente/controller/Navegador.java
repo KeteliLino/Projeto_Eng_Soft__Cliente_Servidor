@@ -1,8 +1,8 @@
 package com.atm.cliente.controller;
 
-import com.atm.cliente.model.Sessao;
 import com.atm.cliente.service.ApiException;
-import com.atm.cliente.service.AtmApi;
+import com.atm.cliente.service.ContaBancariaService;
+import com.atm.cliente.service.ContaServiceProxy;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.concurrent.Callable;
@@ -18,7 +18,8 @@ import javafx.stage.Stage;
 public final class Navegador {
 
     private static final String PASTA_TELAS = "/com/atm/cliente/view/";
-    private static final AtmApi API = new AtmApi();
+    /** As telas só conhecem a interface; quem atende é o proxy do servidor. */
+    private static final ContaBancariaService SERVICO = new ContaServiceProxy();
 
     private static Stage palco;
 
@@ -31,8 +32,8 @@ public final class Navegador {
         palco.setScene(new Scene(login));
     }
 
-    static AtmApi api() {
-        return API;
+    static ContaBancariaService servico() {
+        return SERVICO;
     }
 
     static void ir(String fxml) {
@@ -72,10 +73,9 @@ public final class Navegador {
         linha.start();
     }
 
-    /** Mostra o erro na tela atual, ou volta ao login se a sessão acabou no servidor. */
+    /** Mostra o erro na tela atual, ou volta ao login se a sessão acabou (o proxy já a encerrou). */
     static void mostrarErro(Exception erro, Label rotulo) {
         if (erro instanceof ApiException api && api.getStatus() == 401) {
-            Sessao.encerrar();
             ir("Login.fxml", (LoginController login) -> login.exibirMensagem(erro.getMessage()));
             return;
         }

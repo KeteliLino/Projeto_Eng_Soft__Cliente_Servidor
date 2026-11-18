@@ -15,7 +15,7 @@ Projeto de Engenharia de Software: caixa eletrônico com saque, depósito, saldo
 
 ## Como executar
 
-**1. Criar o banco.** Execute [banco/schema.sql](banco/schema.sql) no MySQL Workbench. O script não apaga dados existentes.
+**1. Criar o banco.** Execute [banco/schema.sql](banco/schema.sql) no MySQL Workbench. O script não apaga dados existentes. Se o banco foi criado com uma versão anterior do script, execute-o de novo: ele acrescenta o que faltar. O servidor avisa ao iniciar quando o banco está desatualizado.
 
 **2. Configurar a senha do MySQL.** Copie `atm-servidor/servidor.local.properties.exemplo` para `atm-servidor/servidor.local.properties` e preencha a senha. Esse arquivo não vai para o Git.
 
@@ -35,23 +35,39 @@ Use o *Run* do projeto. O *Run File* em uma classe do cliente falha com "JavaFX 
 | Maria Silva | `1111222233334444` | `1234` | `0001-1` (R$ 1.000,00), `0001-2` (R$ 250,00) |
 | João Souza | `5555666677778888` | `4321` | `0002-1` (R$ 500,00) |
 
+Após 3 senhas erradas seguidas, o cartão é bloqueado. Para desbloquear um cartão de teste, execute no Workbench:
+
+```sql
+UPDATE caixa_eletronico.cliente SET tentativas_pin = 0 WHERE cartao = '1111222233334444';
+```
+
 ## Estrutura
 
 ```
 banco/schema.sql            Tabelas e dados de teste
 atm-servidor/               Servidor
+  Configuracao              Configuração do servidor (Singleton)
   model/                    Conta, Cliente, Transacao, TipoTransacao
-  dao/                      Acesso ao MySQL
-  service/                  ContaService (regras), SessaoService (tokens), Senhas (hash do PIN)
+  command/                  Operações bancárias (Command)
+  dao/                      Acesso ao MySQL; ConexaoBD (Singleton)
+  service/                  ContaService (invocador), SessaoService (Singleton), Senhas (hash do PIN)
   controller/               ApiController (rotas HTTP)
 atm-cliente/                Cliente
   resources/.../view/       Telas FXML e atm.css (View)
   controller/               Controllers das telas (Controller)
-  model/                    Dados recebidos do servidor (Model)
-  service/                  AtmApi (chamadas HTTP)
+  model/                    Dados recebidos do servidor (Model); Sessao (Singleton)
+  service/                  ContaBancariaService e ContaServiceProxy (Proxy)
 ```
 
 Cliente e servidor são independentes e só se comunicam por HTTP. O Model com as regras de negócio fica no servidor. A View fica no cliente.
+
+## Padrões de projeto (GoF)
+
+| Padrão | Categoria | Onde | Problema que resolve |
+|---|---|---|---|
+| **Singleton** | Criacional | `Configuracao`, `ConexaoBD` e `SessaoService` (servidor); `Sessao` (cliente) | Garante uma única instância compartilhada. Ex.: o token criado no login precisa ser encontrado pelo mesmo `SessaoService` nas operações seguintes. |
+| **Command** | Comportamental | `OperacaoCommand`, `SaqueCommand`, `DepositoCommand`, `SaldoCommand`, `ExtratoCommand`; invocador: `ContaService.executar()` | Cada operação vira um objeto. O invocador executa todas do mesmo jeito, numa transação do banco, e grava cada uma em `operacao_log`. Nova operação = nova classe. |
+| **Proxy** | Estrutural | `ContaBancariaService` (interface) e `ContaServiceProxy` (cliente) | As telas chamam o serviço como se fosse local. O proxy esconde o HTTP (proxy remoto) e controla o acesso com a sessão e o token (proxy de proteção). O objeto real é o `ContaService` do servidor. |
 
 ## Editar as telas
 
@@ -69,6 +85,8 @@ No NetBeans, configure o Scene Builder em *Tools > Options > Java > JavaFX*. Dep
 | GET | `/api/contas/{numero}/extrato` | | 200 `{conta, saldo, transacoes}` |
 
 As rotas de conta exigem o cabeçalho `Authorization: Bearer <token>`. Os erros vêm como `{"erro": "mensagem"}`.
+
+Cada operação de conta executada é registrada em `operacao_log` com o resultado `SUCESSO`, `RECUSADA` (ex.: saldo insuficiente) ou `ERRO`. Para consultar no Workbench: `SELECT * FROM operacao_log ORDER BY id DESC;`
 
 ## Rodar em duas máquinas
 

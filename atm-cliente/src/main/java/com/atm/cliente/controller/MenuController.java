@@ -15,12 +15,14 @@ public class MenuController {
     @FXML
     private Label mensagem;
 
+    private final Sessao sessao = Sessao.getInstancia();
+
     @FXML
     private void initialize() {
-        saudacao.setText("Olá, " + Sessao.getNome());
-        comboConta.getItems().setAll(Sessao.getContas());
-        comboConta.setValue(Sessao.getContaAtual());
-        comboConta.valueProperty().addListener((obs, antiga, nova) -> Sessao.setContaAtual(nova));
+        saudacao.setText("Olá, " + sessao.getNome());
+        comboConta.getItems().setAll(sessao.getContas());
+        comboConta.setValue(sessao.getContaAtual());
+        comboConta.valueProperty().addListener((obs, antiga, nova) -> sessao.setContaAtual(nova));
     }
 
     @FXML
@@ -39,28 +41,24 @@ public class MenuController {
 
     @FXML
     private void abrirSaldo() {
-        Navegador.executar(() -> Navegador.api().saldo(Sessao.getContaAtual()),
+        Navegador.executar(() -> Navegador.servico().saldo(sessao.getContaAtual()),
                 saldo -> Navegador.ir("Saldo.fxml", (SaldoController tela) -> tela.exibir(saldo)),
                 erro -> Navegador.mostrarErro(erro, mensagem));
     }
 
     @FXML
     private void abrirExtrato() {
-        Navegador.executar(() -> Navegador.api().extrato(Sessao.getContaAtual()),
+        Navegador.executar(() -> Navegador.servico().extrato(sessao.getContaAtual()),
                 extrato -> Navegador.ir("Extrato.fxml", (ExtratoController tela) -> tela.exibir(extrato)),
                 erro -> Navegador.mostrarErro(erro, mensagem));
     }
 
+    /** O proxy encerra a sessão local mesmo se o servidor não responder; aqui só se volta ao login. */
     @FXML
     private void sair() {
         Navegador.executar(() -> {
-            Navegador.api().sair();
+            Navegador.servico().sair();
             return true;
-        }, ok -> voltarAoLogin(), erro -> voltarAoLogin());
-    }
-
-    private void voltarAoLogin() {
-        Sessao.encerrar();
-        Navegador.ir("Login.fxml");
+        }, ok -> Navegador.ir("Login.fxml"), erro -> Navegador.ir("Login.fxml"));
     }
 }

@@ -92,3 +92,18 @@
     -fx-font-weight: bold;
     -fx-text-fill: #12365f;
 }
+
+.table-view {
+    -fx-font-size: 12px;
+}
+
+/* Cores do extrato, como em extratos bancários: crédito e saldo em azul, débito em vermelho */
+.table-cell.credito, .table-cell.saldo-extrato {
+    -fx-text-fill: #1d4ed8;
+    -fx-alignment: center-right;
+}
+
+.table-cell.debito {
+    -fx-text-fill: #c62828;
+    -fx-alignment: center-right;
+}
