@@ -147,6 +147,7 @@ public class ContaServiceProxy implements ContaBancariaService {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-        return config.getProperty("servidor.url");
+        // -Dservidor.url=... tem prioridade: os testes de sistema usam isso para apontar o servidor de teste.
+        return System.getProperty("servidor.url", config.getProperty("servidor.url"));
     }
 }

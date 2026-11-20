@@ -57,6 +57,7 @@ atm-cliente/                Cliente
   controller/               Controllers das telas (Controller)
   model/                    Dados recebidos do servidor (Model); Sessao (Singleton)
   service/                  ContaBancariaService e ContaServiceProxy (Proxy)
+atm-testes-sistema/         Testes de sistema (servidor + terminal + banco de teste)
 ```
 
 Cliente e servidor são independentes e só se comunicam por HTTP. O Model com as regras de negócio fica no servidor. A View fica no cliente.
@@ -109,6 +110,34 @@ A comunicação é HTTP sem criptografia, adequada apenas para demonstração em
 
 ## Testes
 
+Os testes cobrem três classes do sistema — `Conta`, `Cliente` e `SessaoService` — em três etapas:
+
+| Etapa | Técnica | Conta | Cliente | SessaoService |
+|---|---|---|---|---|
+| Unidade | Caixa branca | `ContaTest` | `ClienteTest` | `SessaoServiceTest` |
+| Integração | Caixa cinza | `ContaIntegracaoIT` | `ClienteIntegracaoIT` | `SessaoIntegracaoIT` |
+| Sistema | Caixa preta | `ContaSistemaIT` | `ClienteSistemaIT` | `SessaoSistemaIT` |
+
+Cada classe de teste tem 2 casos (18 no total), mais o `ConfiguracaoTest`, escrito com TDD.
+
+- **Unidade** (`atm-servidor/src/test/.../model` e `service`): cada classe sozinha, sem banco nem rede.
+- **Integração** (`atm-servidor/src/test/.../integracao`): a classe junto com `ContaService`, comandos, DAOs, `ApiController` e o MySQL.
+- **Sistema** (módulo `atm-testes-sistema`): o terminal JavaFX abre e o teste usa as telas como o cliente (digita, clica e lê o que aparece), com o servidor de verdade por trás.
+
+Só os testes de unidade (rápidos, sem MySQL):
+
 ```bash
 mvn test
 ```
+
+Todos os testes (unidade, integração e sistema):
+
+```bash
+mvn verify
+```
+
+No NetBeans: botão direito no projeto **Caixa Eletronico** > **Run Maven** > **Testes completos (verify)**.
+
+Os testes de integração e de sistema precisam do MySQL ligado. Eles usam a senha de `atm-servidor/servidor.local.properties` e criam (e recriam a cada teste) o banco **`caixa_eletronico_teste`**, a partir de `banco/schema.sql`. O banco `caixa_eletronico` nunca é alterado. Durante os testes de sistema, a janela do terminal abre e fecha sozinha.
+
+Para usar outro MySQL: `mvn verify -Ddb.servidor=host:porta -Ddb.usuario=... -Ddb.senha=...`

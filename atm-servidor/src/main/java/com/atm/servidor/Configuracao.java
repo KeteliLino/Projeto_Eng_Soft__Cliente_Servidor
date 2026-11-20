@@ -10,7 +10,8 @@ import java.util.Properties;
 
 /**
  * Singleton: a configuração do servidor é lida uma única vez e compartilhada por todo o sistema.
- * Valores de servidor.properties, sobrescritos pelos de servidor.local.properties, se existir.
+ * Valores de servidor.properties, sobrescritos pelos de servidor.local.properties, se existir,
+ * e por propriedades do sistema (-Dchave=valor).
  */
 public final class Configuracao {
 
@@ -41,8 +42,9 @@ public final class Configuracao {
         return instancia;
     }
 
+    /** Uma propriedade do sistema (-Dchave=valor) tem prioridade; os testes usam isso para apontar o banco de teste. */
     public String get(String chave) {
-        return propriedades.getProperty(chave);
+        return System.getProperty(chave, propriedades.getProperty(chave));
     }
 
     public Path getArquivoLocal() {

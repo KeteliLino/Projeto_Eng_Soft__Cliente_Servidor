@@ -13,6 +13,7 @@
     <modules>
         <module>atm-servidor</module>
         <module>atm-cliente</module>
+        <module>atm-testes-sistema</module>
     </modules>
 
     <properties>
@@ -43,6 +44,25 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>3.5.4</version>
+                </plugin>
+                <!-- Testes de integração e de sistema (classes terminadas em IT): rodam com mvn verify -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>3.5.4</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.4.2</version>
                 </plugin>
             </plugins>
         </pluginManagement>

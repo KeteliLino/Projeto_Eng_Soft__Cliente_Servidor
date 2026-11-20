@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+    <!-- Botão direito no projeto > Run Maven > Testes completos (verify) -->
+    <action>
+        <actionName>CUSTOM-verify</actionName>
+        <displayName>Testes completos (verify)</displayName>
+        <goals>
+            <goal>verify</goal>
+        </goals>
+    </action>
+</actions>
