@@ -19,10 +19,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Teste de sistema da classe Conta (caixa preta): saque, depósito e extrato feitos pelas telas
+ * Teste de sistema da classe Conta (caixa preta): saque, saldo e extrato feitos pelas telas
  * do terminal, do ponto de vista do cliente.
  */
-@DisplayName("Sistema - Conta: saque, depósito e extrato pelo terminal")
+@DisplayName("Sistema - Conta: saque, saldo e extrato pelo terminal")
 class ContaSistemaIT {
 
     @BeforeAll
@@ -47,6 +47,15 @@ class ContaSistemaIT {
         esperarTexto("#aviso", "Retire suas cédulas e o comprovante.");
         assertEquals("R$ 100,00", texto("#valor"));
         assertEquals("R$ 900,00", texto("#saldo"));
+    }
+
+    @Test
+    @DisplayName("CT-08: a tela de saldo mostra o saldo da conta escolhida")
+    void consultaDeSaldoMostraOSaldoDaConta() {
+        clicar("Saldo");
+
+        esperarTexto("#contaInfo", "Conta 0001-1");
+        esperarTexto("#valorSaldo", "R$ 1.000,00");
     }
 
     @Test

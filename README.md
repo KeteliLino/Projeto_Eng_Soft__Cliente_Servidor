@@ -118,7 +118,7 @@ Os testes cobrem três classes do sistema — `Conta`, `Cliente` e `SessaoServic
 | Integração | Caixa cinza | `ContaIntegracaoIT` | `ClienteIntegracaoIT` | `SessaoIntegracaoIT` |
 | Sistema | Caixa preta | `ContaSistemaIT` | `ClienteSistemaIT` | `SessaoSistemaIT` |
 
-Cada classe de teste tem 2 casos (18 no total), mais o `ConfiguracaoTest`, escrito com TDD.
+São 24 casos: 2 por classe de teste, mais os que cobrem os casos de teste CT-04, CT-07, CT-08 e CT-12 na classe `Conta`, e o `ConfiguracaoTest`, escrito com TDD.
 
 - **Unidade** (`atm-servidor/src/test/.../model` e `service`): cada classe sozinha, sem banco nem rede.
 - **Integração** (`atm-servidor/src/test/.../integracao`): a classe junto com `ContaService`, comandos, DAOs, `ApiController` e o MySQL.

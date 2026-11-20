@@ -21,6 +21,13 @@ class ContaTest {
     }
 
     @Test
+    @DisplayName("CT-07: saque de todo o saldo é permitido e zera a conta (valor limite)")
+    void sacarTodoOSaldoEhPermitido() {
+        conta.sacar(new BigDecimal("100.00"));
+        assertEquals(new BigDecimal("0.00"), conta.getSaldo());
+    }
+
+    @Test
     @DisplayName("Saque acima do saldo é recusado e o saldo não muda")
     void sacarMaisQueOSaldoFalhaESaldoNaoMuda() {
         assertThrows(SaldoInsuficienteException.class, () -> conta.sacar(new BigDecimal("100.01")));
