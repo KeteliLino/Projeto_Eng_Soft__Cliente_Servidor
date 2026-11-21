@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox prefHeight="560.0" prefWidth="460.0" styleClass="tela" stylesheets="@atm.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.atm.cliente.controller.MenuController">
+   <children>
+      <Label fx:id="saudacao" styleClass="titulo" text="Olá" />
+      <Label styleClass="rotulo-campo" text="Conta" />
+      <ComboBox fx:id="comboConta" maxWidth="1.7976931348623157E308" />
+      <Region prefHeight="8.0" />
+      <Button mnemonicParsing="false" onAction="#abrirSaque" styleClass="botao-principal" text="Saque" />
+      <Button mnemonicParsing="false" onAction="#abrirDeposito" styleClass="botao-principal" text="Depósito" />
+      <Button mnemonicParsing="false" onAction="#abrirSaldo" styleClass="botao-principal" text="Saldo" />
+      <Button mnemonicParsing="false" onAction="#abrirExtrato" styleClass="botao-principal" text="Extrato" />
+      <Button mnemonicParsing="false" onAction="#sair" styleClass="botao-secundario" text="Sair" />
+      <Label fx:id="mensagem" styleClass="mensagem-erro" />
+   </children>
+</VBox>

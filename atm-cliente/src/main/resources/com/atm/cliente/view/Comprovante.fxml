@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox prefHeight="560.0" prefWidth="460.0" styleClass="tela" stylesheets="@atm.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.atm.cliente.controller.ComprovanteController">
+   <children>
+      <Label styleClass="titulo" text="Comprovante" />
+      <Label fx:id="aviso" styleClass="mensagem-sucesso" />
+      <GridPane styleClass="cartao">
+         <children>
+            <Label styleClass="rotulo-campo" text="Operação" GridPane.rowIndex="0" />
+            <Label fx:id="operacao" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+            <Label styleClass="rotulo-campo" text="Conta" GridPane.rowIndex="1" />
+            <Label fx:id="conta" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Label styleClass="rotulo-campo" text="Valor" GridPane.rowIndex="2" />
+            <Label fx:id="valor" styleClass="valor-destaque" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Label styleClass="rotulo-campo" text="Saldo atual" GridPane.rowIndex="3" />
+            <Label fx:id="saldo" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <Label styleClass="rotulo-campo" text="Data e hora" GridPane.rowIndex="4" />
+            <Label fx:id="dataHora" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <Label styleClass="rotulo-campo" text="Código" GridPane.rowIndex="5" />
+            <Label fx:id="codigo" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+         </children>
+      </GridPane>
+      <Region prefHeight="8.0" />
+      <Button mnemonicParsing="false" onAction="#voltar" styleClass="botao-principal" text="Voltar ao menu" />
+   </children>
+</VBox>
