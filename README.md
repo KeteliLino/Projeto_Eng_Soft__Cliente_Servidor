@@ -2,7 +2,8 @@
 
 Projeto de Engenharia de Software: caixa eletrônico com saque, depósito, saldo e extrato, em arquitetura cliente/servidor e MVC.
 
-Equipe: Augusto Barbosa (github: https://github.com/nicolasferr06 ), Jéssica Soares (github: https://github.com/JeehSilphis ), Keteli Lino (github: https://github.com/KeteliLino ) e Nicolas Borges (github: https://github.com/nicolasferr06 ).
+Equipe: Augusto Barbosa (github: https://github.com/AugustoBarbosa-Zotake ), Jéssica Soares (github: https://github.com/JeehSilphis ), Keteli Lino (github: https://github.com/KeteliLino ) e Nicolas Borges (github: https://github.com/nicolasferr06 ).
+
 
 - **Cliente:** Java + JavaFX, com telas FXML editáveis no Scene Builder
 - **Servidor:** Java, com API HTTP/JSON
