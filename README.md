@@ -9,6 +9,8 @@ Equipe: Augusto Barbosa (github: https://github.com/AugustoBarbosa-Zotake ), Jé
 - **Servidor:** Java, com API HTTP/JSON
 - **Banco de dados:** MySQL
 
+Documentação completa (requisitos, arquitetura, diagramas, padrões e testes): [docs/Documentacao_ClienteServidor_CaixaEletronico.md](docs/Documentacao_ClienteServidor_CaixaEletronico.md)
+
 ## Requisitos
 
 - JDK 25 ou mais recente
@@ -61,6 +63,7 @@ atm-cliente/                Cliente
   model/                    Dados recebidos do servidor (Model); Sessao (Singleton)
   service/                  ContaBancariaService e ContaServiceProxy (Proxy)
 atm-testes-sistema/         Testes de sistema (servidor + terminal + banco de teste)
+docs/                       Documentação do projeto, imagens e diagramas draw.io
 ```
 
 Cliente e servidor são independentes e só se comunicam por HTTP. O Model com as regras de negócio fica no servidor. A View fica no cliente.
