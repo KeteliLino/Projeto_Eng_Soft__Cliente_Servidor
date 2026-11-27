@@ -50,13 +50,13 @@ O sistema permite que um cliente bancário, em um **terminal ATM**, se autentiqu
 
 ### 1.3 Stakeholders
 
-| Nome / Papel | Responsabilidade | Contato |
-|---|---|---|
-| Product Owner | Priorizar as operações bancárias e validar os critérios de aceite | [preencher] |
-| Arquiteto de Software | Definir a separação cliente (ATM) × servidor, o protocolo de comunicação e os padrões GoF | [preencher] |
-| Time de Desenvolvimento | Implementar o terminal ATM, o `ContaService`, o modelo de domínio e os DAOs | [preencher] |
-| Time de QA | Elaborar e executar os testes de unidade, integração e sistema (JUnit 5) e os casos de teste CT-XX | [preencher] |
-| Cliente / Patrocinador | Instituição bancária que opera os terminais | [preencher] |
+| Nome / Papel | Responsabilidade |
+|---|---|
+| Product Owner | Priorizar as operações bancárias e validar os critérios de aceite |
+| Arquiteto de Software | Definir a separação cliente (ATM) × servidor, o protocolo de comunicação e os padrões GoF |
+| Time de Desenvolvimento | Implementar o terminal ATM, o `ContaService`, o modelo de domínio e os DAOs |
+| Time de QA | Elaborar e executar os testes de unidade, integração e sistema (JUnit 5) e os casos de teste CT-XX |
+| Cliente / Patrocinador | Instituição bancária que opera os terminais |
 
 
 ---
